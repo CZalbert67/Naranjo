@@ -68,20 +68,6 @@ const { title, description = 'Sistema Web de Gestión y Digitalización de Órde
         </a>
 
         <nav class="flex items-center space-x-3">
-          <a href="/operario" class="text-xs sm:text-sm font-semibold text-slate-200 hover:text-orange-400 bg-slate-800/80 hover:bg-slate-800 px-3 py-2 rounded-xl border border-sky-900/40 transition-colors flex items-center space-x-1.5">
-            <svg class="w-4 h-4 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-            </svg>
-            <span>Reportar Falla</span>
-          </a>
-
-          <a href="/dashboard" class="text-xs sm:text-sm font-semibold text-slate-200 hover:text-orange-400 bg-slate-800/80 hover:bg-slate-800 px-3 py-2 rounded-xl border border-sky-900/40 transition-colors flex items-center space-x-1.5">
-            <svg class="w-4 h-4 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-            </svg>
-            <span>Dashboard TI</span>
-          </a>
-
           <a href="/" class="text-xs font-extrabold bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-400 hover:to-orange-500 text-white px-4 py-2 rounded-xl transition-all shadow-lg shadow-orange-500/20">
             Login
           </a>
@@ -100,7 +86,6 @@ const { title, description = 'Sistema Web de Gestión y Digitalización de Órde
     </footer>
 
     <script>
-      // Control de la animación de bienvenida al arrancar la aplicación
       window.addEventListener('DOMContentLoaded', () => {
         const loader = document.getElementById('appSplashLoader');
         if (loader) {
