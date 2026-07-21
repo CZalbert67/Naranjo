@@ -1,0 +1,186 @@
+---
+---
+
+<div class="w-full max-w-xl mx-auto bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl p-6 sm:p-8">
+  <div class="flex items-center space-x-3 mb-6 pb-4 border-b border-slate-800">
+    <div class="w-12 h-12 bg-amber-500/10 border border-amber-500/30 rounded-xl flex items-center justify-center text-amber-400">
+      <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+      </svg>
+    </div>
+    <div>
+      <h2 class="text-xl font-bold text-white">Reportar Falla Técnica</h2>
+      <p class="text-xs text-slate-400">Genera una orden de trabajo directa a Sistemas</p>
+    </div>
+  </div>
+
+  <!-- Banners de Alerta -->
+  <div id="ticketSuccessAlert" class="hidden mb-6 p-4 bg-emerald-500/10 border border-emerald-500/30 rounded-xl text-emerald-400 text-sm font-semibold flex items-center space-x-2">
+    <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+    </svg>
+    <span id="ticketSuccessMessage">Reporte Enviado Exitosamente</span>
+  </div>
+
+  <div id="ticketErrorAlert" class="hidden mb-6 p-4 bg-red-500/10 border border-red-500/30 rounded-xl text-red-400 text-sm font-semibold flex items-center space-x-2">
+    <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+    </svg>
+    <span id="ticketErrorMessage">Error al enviar el reporte.</span>
+  </div>
+
+  <form id="ticketForm" class="space-y-6">
+    <div>
+      <label for="selectArea" class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">
+        1. Selecciona tu Área <span class="text-amber-400">*</span>
+      </label>
+      <select 
+        id="selectArea" 
+        name="id_area" 
+        required 
+        class="w-full px-4 py-3 bg-slate-950 border border-slate-800 rounded-xl text-white focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 touch-target text-base"
+      >
+        <option value="">-- Seleccionar Área --</option>
+      </select>
+    </div>
+
+    <div>
+      <label for="selectEquipo" class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">
+        2. Selecciona el Equipo <span class="text-amber-400">*</span>
+      </label>
+      <select 
+        id="selectEquipo" 
+        name="id_equipo" 
+        required 
+        class="w-full px-4 py-3 bg-slate-950 border border-slate-800 rounded-xl text-white focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 touch-target text-base"
+      >
+        <option value="">-- Primero selecciona un Área --</option>
+      </select>
+    </div>
+
+    <div>
+      <label for="descripcion" class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">
+        3. Describe Brevemente la Falla <span class="text-amber-400">*</span>
+      </label>
+      <textarea 
+        id="descripcion" 
+        name="descripcion" 
+        rows="4" 
+        required 
+        placeholder="Ej: Falla en impresora de etiquetas, no enciende el monitor o se cayó la red..."
+        class="w-full px-4 py-3 bg-slate-950 border border-slate-800 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 text-base"
+      ></textarea>
+    </div>
+
+    <button 
+      type="submit" 
+      id="btnSendTicket"
+      class="w-full touch-target bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold rounded-xl transition-all shadow-lg shadow-amber-500/25 active:scale-[0.98] flex items-center justify-center text-lg uppercase tracking-wide"
+    >
+      <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
+      </svg>
+      <span>Enviar Reporte</span>
+    </button>
+  </form>
+</div>
+
+<script>
+  let catalogEquipos: Array<{ id_equipo: number; id_area: number; tipo_equipo: string }> = [];
+
+  const selectArea = document.getElementById('selectArea') as HTMLSelectElement;
+  const selectEquipo = document.getElementById('selectEquipo') as HTMLSelectElement;
+  const ticketForm = document.getElementById('ticketForm') as HTMLFormElement;
+  const successAlert = document.getElementById('ticketSuccessAlert') as HTMLDivElement;
+  const successMsg = document.getElementById('ticketSuccessMessage') as HTMLSpanElement;
+  const errorAlert = document.getElementById('ticketErrorAlert') as HTMLDivElement;
+  const errorMsg = document.getElementById('ticketErrorMessage') as HTMLSpanElement;
+  const btnSend = document.getElementById('btnSendTicket') as HTMLButtonElement;
+
+  async function loadCatalogs() {
+    try {
+      const res = await fetch('/api/catalogs');
+      const data = await res.json();
+      if (data.areas && selectArea) {
+        selectArea.innerHTML = '<option value="">-- Seleccionar Área --</option>';
+        data.areas.forEach((area: any) => {
+          const opt = document.createElement('option');
+          opt.value = area.id_area;
+          opt.textContent = area.nombre_area;
+          selectArea.appendChild(opt);
+        });
+      }
+      if (data.equipos) {
+        catalogEquipos = data.equipos;
+      }
+    } catch (err) {
+      console.error('Error cargando catálogos:', err);
+    }
+  }
+
+  if (selectArea) {
+    selectArea.addEventListener('change', () => {
+      const selectedAreaId = parseInt(selectArea.value, 10);
+      selectEquipo.innerHTML = '<option value="">-- Selecciona el Equipo --</option>';
+      if (!isNaN(selectedAreaId)) {
+        const filtered = catalogEquipos.filter((e) => e.id_area === selectedAreaId);
+        if (filtered.length > 0) {
+          filtered.forEach((eq) => {
+            const opt = document.createElement('option');
+            opt.value = eq.id_equipo.toString();
+            opt.textContent = eq.tipo_equipo;
+            selectEquipo.appendChild(opt);
+          });
+        } else {
+          // Si no hay filtro estricto, mostrar todos los equipos
+          catalogEquipos.forEach((eq) => {
+            const opt = document.createElement('option');
+            opt.value = eq.id_equipo.toString();
+            opt.textContent = eq.tipo_equipo;
+            selectEquipo.appendChild(opt);
+          });
+        }
+      }
+    });
+  }
+
+  if (ticketForm) {
+    ticketForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      successAlert.classList.add('hidden');
+      errorAlert.classList.add('hidden');
+      btnSend.disabled = true;
+      btnSend.innerText = 'Enviando...';
+
+      const id_equipo = selectEquipo.value;
+      const descripcion = (document.getElementById('descripcion') as HTMLTextAreaElement).value;
+
+      try {
+        const res = await fetch('/api/tickets', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id_equipo, descripcion }),
+        });
+
+        const data = await res.json();
+
+        if (res.ok && data.success) {
+          successMsg.innerText = data.message || 'Reporte Enviado Exitosamente';
+          successAlert.classList.remove('hidden');
+          ticketForm.reset();
+        } else {
+          errorMsg.innerText = data.error || 'Ocurrió un error al registrar la orden.';
+          errorAlert.classList.remove('hidden');
+        }
+      } catch (err) {
+        errorMsg.innerText = 'Error de conexión con el servidor.';
+        errorAlert.classList.remove('hidden');
+      } finally {
+        btnSend.disabled = false;
+        btnSend.innerText = 'Enviar Reporte';
+      }
+    });
+  }
+
+  loadCatalogs();
+</script>

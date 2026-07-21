@@ -1,0 +1,102 @@
+---
+---
+
+<div class="w-full max-w-md mx-auto bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl overflow-hidden p-6 sm:p-8">
+  <div class="text-center mb-6">
+    <div class="w-14 h-14 bg-amber-500/10 border border-amber-500/30 rounded-2xl flex items-center justify-center mx-auto mb-3 text-amber-400">
+      <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+      </svg>
+    </div>
+    <h2 class="text-2xl font-bold text-white tracking-tight">Acceso al Sistema</h2>
+    <p class="text-xs text-slate-400 mt-1">Ingresa tus credenciales autorizadas</p>
+  </div>
+
+  <div id="loginAlert" class="hidden mb-4 p-3 bg-red-500/10 border border-red-500/30 rounded-xl text-red-400 text-sm font-medium text-center"></div>
+
+  <form id="loginForm" class="space-y-5">
+    <div>
+      <label for="usuario" class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">Usuario</label>
+      <input 
+        type="text" 
+        id="usuario" 
+        name="usuario" 
+        required 
+        placeholder="ej. admin u operario1"
+        class="w-full px-4 py-3 bg-slate-950 border border-slate-800 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-all touch-target text-base"
+      />
+    </div>
+
+    <div>
+      <label for="password" class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">Contraseña</label>
+      <input 
+        type="password" 
+        id="password" 
+        name="password" 
+        required 
+        placeholder="••••••••"
+        class="w-full px-4 py-3 bg-slate-950 border border-slate-800 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-all touch-target text-base"
+      />
+    </div>
+
+    <button 
+      type="submit" 
+      id="submitBtn"
+      class="w-full touch-target bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-xl transition-all shadow-lg shadow-amber-500/25 active:scale-[0.98] flex items-center justify-center text-base"
+    >
+      <span>Ingresar</span>
+    </button>
+  </form>
+
+  <div class="mt-6 pt-4 border-t border-slate-800/80 text-center text-xs text-slate-400">
+    <p>Credenciales de prueba rápida:</p>
+    <p class="font-mono mt-1 text-amber-400">Admin: admin / admin123</p>
+    <p class="font-mono text-amber-400">Operario: operario1 / operario123</p>
+  </div>
+</div>
+
+<script>
+  const form = document.getElementById('loginForm') as HTMLFormElement;
+  const alertDiv = document.getElementById('loginAlert') as HTMLDivElement;
+  const submitBtn = document.getElementById('submitBtn') as HTMLButtonElement;
+
+  if (form) {
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      alertDiv.classList.add('hidden');
+      submitBtn.disabled = true;
+      submitBtn.innerText = 'Verificando...';
+
+      const formData = new FormData(form);
+      const usuario = formData.get('usuario');
+      const password = formData.get('password');
+
+      try {
+        const res = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ usuario, password }),
+        });
+
+        const data = await res.json();
+
+        if (res.ok && data.success) {
+          if (data.user?.rol === 'Administrador') {
+            window.location.href = '/dashboard';
+          } else {
+            window.location.href = '/operario';
+          }
+        } else {
+          alertDiv.innerText = data.error || 'Credenciales inválidas.';
+          alertDiv.classList.remove('hidden');
+        }
+      } catch (err) {
+        alertDiv.innerText = 'Error al intentar iniciar sesión. Inténtalo de nuevo.';
+        alertDiv.classList.remove('hidden');
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerText = 'Ingresar';
+      }
+    });
+  }
+</script>

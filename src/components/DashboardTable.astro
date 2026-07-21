@@ -1,0 +1,203 @@
+---
+---
+
+<div class="space-y-6">
+  <!-- Tarjetas de Resumen KPI -->
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+    <div class="bg-slate-900 border border-slate-800 p-4 rounded-xl">
+      <p class="text-xs font-semibold text-slate-400 uppercase">Total Activas</p>
+      <p id="kpiTotal" class="text-3xl font-extrabold text-white mt-1">0</p>
+    </div>
+    <div class="bg-slate-900 border border-amber-500/20 p-4 rounded-xl">
+      <p class="text-xs font-semibold text-amber-400 uppercase">En Proceso</p>
+      <p id="kpiProceso" class="text-3xl font-extrabold text-amber-400 mt-1">0</p>
+    </div>
+    <div class="bg-slate-900 border border-red-500/20 p-4 rounded-xl">
+      <p class="text-xs font-semibold text-red-400 uppercase">Pendientes</p>
+      <p id="kpiPendientes" class="text-3xl font-extrabold text-red-400 mt-1">0</p>
+    </div>
+    <div class="bg-slate-900 border border-emerald-500/20 p-4 rounded-xl">
+      <p class="text-xs font-semibold text-emerald-400 uppercase">Resueltas Hoy</p>
+      <p id="kpiResueltas" class="text-3xl font-extrabold text-emerald-400 mt-1">0</p>
+    </div>
+  </div>
+
+  <!-- Contenedor de la Tabla -->
+  <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-2xl">
+    <div class="p-4 sm:p-6 border-b border-slate-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <div>
+        <h2 class="text-xl font-bold text-white">Dashboard - Órdenes de Trabajo Activas</h2>
+        <p class="text-xs text-slate-400">Monitoreo en tiempo real del piso de planta</p>
+      </div>
+
+      <button 
+        id="btnRefresh" 
+        class="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 px-4 py-2 rounded-xl text-sm font-semibold transition-all flex items-center space-x-2 touch-target"
+      >
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+        </svg>
+        <span>Actualizar</span>
+      </button>
+    </div>
+
+    <div class="overflow-x-auto">
+      <table class="w-full text-left text-sm text-slate-300">
+        <thead class="bg-slate-950/80 text-xs font-bold text-slate-400 uppercase border-b border-slate-800">
+          <tr>
+            <th class="px-4 py-3">ID Ticket</th>
+            <th class="px-4 py-3">Fecha</th>
+            <th class="px-4 py-3">Área / Equipo</th>
+            <th class="px-4 py-3">Descripción de Falla</th>
+            <th class="px-4 py-3">Operario</th>
+            <th class="px-4 py-3">Estado</th>
+            <th class="px-4 py-3 text-right">Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="ticketsTableBody" class="divide-y divide-slate-800/60">
+          <tr>
+            <td colspan="7" class="px-4 py-8 text-center text-slate-500">Cargando órdenes de trabajo...</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+  interface Ticket {
+    id_ticket: number;
+    id_usuario: number;
+    nombre_usuario?: string;
+    id_equipo: number;
+    nombre_equipo?: string;
+    nombre_area?: string;
+    descripcion: string;
+    estado: 'Pendiente' | 'En Proceso' | 'Resuelto';
+    fecha_reporte: string;
+  }
+
+  const tableBody = document.getElementById('ticketsTableBody') as HTMLTableSectionElement;
+  const btnRefresh = document.getElementById('btnRefresh') as HTMLButtonElement;
+
+  const kpiTotal = document.getElementById('kpiTotal') as HTMLParagraphElement;
+  const kpiProceso = document.getElementById('kpiProceso') as HTMLParagraphElement;
+  const kpiPendientes = document.getElementById('kpiPendientes') as HTMLParagraphElement;
+  const kpiResueltas = document.getElementById('kpiResueltas') as HTMLParagraphElement;
+
+  async function fetchTickets() {
+    try {
+      tableBody.innerHTML = `<tr><td colspan="7" class="px-4 py-8 text-center text-slate-500">Cargando datos...</td></tr>`;
+      const res = await fetch('/api/tickets');
+      const tickets: Ticket[] = await res.json();
+
+      renderTickets(tickets);
+    } catch (err) {
+      tableBody.innerHTML = `<tr><td colspan="7" class="px-4 py-8 text-center text-red-400">Error al cargar los tickets.</td></tr>`;
+    }
+  }
+
+  function renderTickets(tickets: Ticket[]) {
+    if (!tickets || tickets.length === 0) {
+      tableBody.innerHTML = `<tr><td colspan="7" class="px-4 py-8 text-center text-slate-500">No hay tickets activos registrados.</td></tr>`;
+      updateKPIs([]);
+      return;
+    }
+
+    updateKPIs(tickets);
+
+    tableBody.innerHTML = '';
+    tickets.forEach((t) => {
+      const tr = document.createElement('tr');
+      tr.className = 'hover:bg-slate-800/40 transition-colors';
+
+      let statusBadge = '';
+      if (t.estado === 'Pendiente') {
+        statusBadge = `<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-red-500/10 text-red-400 border border-red-500/30">Pendiente</span>`;
+      } else if (t.estado === 'En Proceso') {
+        statusBadge = `<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-amber-500/10 text-amber-400 border border-amber-500/30">En Proceso</span>`;
+      } else {
+        statusBadge = `<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">Resuelto</span>`;
+      }
+
+      const formattedDate = new Date(t.fecha_reporte).toLocaleString('es-MX', {
+        day: '2-digit',
+        month: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+      });
+
+      tr.innerHTML = `
+        <td class="px-4 py-4 font-mono font-bold text-amber-400">#TK-${t.id_ticket}</td>
+        <td class="px-4 py-4 text-xs text-slate-400">${formattedDate}</td>
+        <td class="px-4 py-4">
+          <p class="font-semibold text-white">${t.nombre_equipo || `Equipo #${t.id_equipo}`}</p>
+          <p class="text-xs text-slate-400">${t.nombre_area || 'Área General'}</p>
+        </td>
+        <td class="px-4 py-4 max-w-xs text-slate-200 truncate" title="${t.descripcion}">${t.descripcion}</td>
+        <td class="px-4 py-4 text-xs text-slate-300">${t.nombre_usuario || 'Operario'}</td>
+        <td class="px-4 py-4">${statusBadge}</td>
+        <td class="px-4 py-4 text-right space-x-2">
+          ${t.estado !== 'Resuelto' ? `
+            <button 
+              data-id="${t.id_ticket}" 
+              data-status="En Proceso"
+              class="btn-change-status text-xs bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 px-3 py-1.5 rounded-lg transition-colors font-medium"
+            >
+              En Proceso
+            </button>
+            <button 
+              data-id="${t.id_ticket}" 
+              data-status="Resuelto"
+              class="btn-change-status text-xs bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-3 py-1.5 rounded-lg transition-colors font-medium"
+            >
+              Resuelto
+            </button>
+          ` : '<span class="text-xs text-slate-500 font-medium">Finalizado</span>'}
+        </td>
+      `;
+
+      tableBody.appendChild(tr);
+    });
+
+    // Event listeners para botones de cambio de estado
+    document.querySelectorAll('.btn-change-status').forEach((btn) => {
+      btn.addEventListener('click', async (e) => {
+        const target = e.currentTarget as HTMLButtonElement;
+        const id = target.getAttribute('data-id');
+        const newStatus = target.getAttribute('data-status');
+        if (id && newStatus) {
+          await updateTicketStatus(parseInt(id, 10), newStatus);
+        }
+      });
+    });
+  }
+
+  function updateKPIs(tickets: Ticket[]) {
+    if (kpiTotal) kpiTotal.innerText = tickets.length.toString();
+    if (kpiPendientes) kpiPendientes.innerText = tickets.filter((t) => t.estado === 'Pendiente').length.toString();
+    if (kpiProceso) kpiProceso.innerText = tickets.filter((t) => t.estado === 'En Proceso').length.toString();
+    if (kpiResueltas) kpiResueltas.innerText = tickets.filter((t) => t.estado === 'Resuelto').length.toString();
+  }
+
+  async function updateTicketStatus(id: number, estado: string) {
+    try {
+      const res = await fetch(`/api/tickets/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ estado }),
+      });
+      if (res.ok) {
+        fetchTickets();
+      }
+    } catch (err) {
+      console.error('Error al actualizar ticket:', err);
+    }
+  }
+
+  if (btnRefresh) {
+    btnRefresh.addEventListener('click', fetchTickets);
+  }
+
+  fetchTickets();
+</script>
