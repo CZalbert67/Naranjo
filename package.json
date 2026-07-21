@@ -8,6 +8,7 @@
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
+    "db:init": "node scripts/init-db.js",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test"
