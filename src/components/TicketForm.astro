@@ -1,29 +1,29 @@
 ---
 ---
 
-<div class="w-full max-w-xl mx-auto bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl p-6 sm:p-8">
-  <div class="flex items-center space-x-3 mb-6 pb-4 border-b border-slate-800">
-    <div class="w-12 h-12 bg-amber-500/10 border border-amber-500/30 rounded-xl flex items-center justify-center text-amber-400">
-      <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<div class="w-full max-w-xl mx-auto bg-slate-900/90 border border-sky-900/50 rounded-3xl shadow-2xl p-6 sm:p-8 backdrop-blur-xl">
+  <div class="flex items-center space-x-3.5 mb-6 pb-4 border-b border-sky-900/50">
+    <div class="w-12 h-12 bg-gradient-to-tr from-sky-500/20 to-orange-500/20 border border-sky-500/30 rounded-2xl flex items-center justify-center text-orange-400">
+      <svg class="w-7 h-7 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
       </svg>
     </div>
     <div>
-      <h2 class="text-xl font-bold text-white">Reportar Falla Técnica</h2>
-      <p class="text-xs text-slate-400">Genera una orden de trabajo directa a Sistemas</p>
+      <h2 class="text-xl font-bold text-white">Reportar Falla Técnica (TI)</h2>
+      <p class="text-xs text-sky-300">Genera una orden directa al Departamento de Sistemas</p>
     </div>
   </div>
 
   <!-- Banners de Alerta -->
-  <div id="ticketSuccessAlert" class="hidden mb-6 p-4 bg-emerald-500/10 border border-emerald-500/30 rounded-xl text-emerald-400 text-sm font-semibold flex items-center space-x-2">
-    <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+  <div id="ticketSuccessAlert" class="hidden mb-6 p-4 bg-emerald-500/10 border border-emerald-500/30 rounded-2xl text-emerald-400 text-sm font-semibold flex items-center space-x-2">
+    <svg class="w-5 h-5 flex-shrink-0 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
     </svg>
     <span id="ticketSuccessMessage">Reporte Enviado Exitosamente</span>
   </div>
 
-  <div id="ticketErrorAlert" class="hidden mb-6 p-4 bg-red-500/10 border border-red-500/30 rounded-xl text-red-400 text-sm font-semibold flex items-center space-x-2">
-    <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+  <div id="ticketErrorAlert" class="hidden mb-6 p-4 bg-red-500/10 border border-red-500/30 rounded-2xl text-red-400 text-sm font-semibold flex items-center space-x-2">
+    <svg class="w-5 h-5 flex-shrink-0 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
     </svg>
     <span id="ticketErrorMessage">Error al enviar el reporte.</span>
@@ -31,53 +31,53 @@
 
   <form id="ticketForm" class="space-y-6">
     <div>
-      <label for="selectArea" class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">
-        1. Selecciona tu Área <span class="text-amber-400">*</span>
+      <label for="selectArea" class="block text-xs font-bold text-sky-200 uppercase tracking-wider mb-2">
+        1. Selecciona tu Área <span class="text-orange-400">*</span>
       </label>
       <select 
         id="selectArea" 
         name="id_area" 
         required 
-        class="w-full px-4 py-3 bg-slate-950 border border-slate-800 rounded-xl text-white focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 touch-target text-base"
+        class="w-full px-4 py-3 bg-slate-950/80 border border-sky-900/60 rounded-2xl text-white focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 touch-target text-base"
       >
         <option value="">-- Seleccionar Área --</option>
       </select>
     </div>
 
     <div>
-      <label for="selectEquipo" class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">
-        2. Selecciona el Equipo <span class="text-amber-400">*</span>
+      <label for="selectEquipo" class="block text-xs font-bold text-sky-200 uppercase tracking-wider mb-2">
+        2. Selecciona el Equipo de TI <span class="text-orange-400">*</span>
       </label>
       <select 
         id="selectEquipo" 
         name="id_equipo" 
         required 
-        class="w-full px-4 py-3 bg-slate-950 border border-slate-800 rounded-xl text-white focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 touch-target text-base"
+        class="w-full px-4 py-3 bg-slate-950/80 border border-sky-900/60 rounded-2xl text-white focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 touch-target text-base"
       >
         <option value="">-- Primero selecciona un Área --</option>
       </select>
     </div>
 
     <div>
-      <label for="descripcion" class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">
-        3. Describe Brevemente la Falla <span class="text-amber-400">*</span>
+      <label for="descripcion" class="block text-xs font-bold text-sky-200 uppercase tracking-wider mb-2">
+        3. Describe Brevemente la Falla <span class="text-orange-400">*</span>
       </label>
       <textarea 
         id="descripcion" 
         name="descripcion" 
         rows="4" 
         required 
-        placeholder="Ej: Falla en impresora de etiquetas, no enciende el monitor o se cayó la red..."
-        class="w-full px-4 py-3 bg-slate-950 border border-slate-800 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 text-base"
+        placeholder="Ej: Falla en la etiquetadora térmica, la PC de control no enciende o cayó la red Wi-Fi..."
+        class="w-full px-4 py-3 bg-slate-950/80 border border-sky-900/60 rounded-2xl text-white placeholder-slate-500 focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 text-base"
       ></textarea>
     </div>
 
     <button 
       type="submit" 
       id="btnSendTicket"
-      class="w-full touch-target bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold rounded-xl transition-all shadow-lg shadow-amber-500/25 active:scale-[0.98] flex items-center justify-center text-lg uppercase tracking-wide"
+      class="w-full touch-target bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-400 hover:to-orange-500 text-white font-extrabold rounded-2xl transition-all shadow-lg shadow-orange-500/30 active:scale-[0.98] flex items-center justify-center text-lg uppercase tracking-wide"
     >
-      <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <svg class="w-6 h-6 mr-2 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
       </svg>
       <span>Enviar Reporte</span>
@@ -121,7 +121,7 @@
   if (selectArea) {
     selectArea.addEventListener('change', () => {
       const selectedAreaId = parseInt(selectArea.value, 10);
-      selectEquipo.innerHTML = '<option value="">-- Selecciona el Equipo --</option>';
+      selectEquipo.innerHTML = '<option value="">-- Selecciona el Equipo de TI --</option>';
       if (!isNaN(selectedAreaId)) {
         const filtered = catalogEquipos.filter((e) => e.id_area === selectedAreaId);
         if (filtered.length > 0) {
@@ -132,7 +132,6 @@
             selectEquipo.appendChild(opt);
           });
         } else {
-          // Si no hay filtro estricto, mostrar todos los equipos
           catalogEquipos.forEach((eq) => {
             const opt = document.createElement('option');
             opt.value = eq.id_equipo.toString();
