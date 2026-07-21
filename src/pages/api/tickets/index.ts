@@ -1,32 +1,7 @@
 import type { APIRoute } from 'astro';
 import { getDbPool } from '../../../lib/db';
 import { getSessionFromCookie } from '../../../lib/auth';
-
-// En-memoria fallback para dev/testing cuando SQL Server local no está disponible
-let inMemoryTickets = [
-  {
-    id_ticket: 1,
-    id_usuario: 2,
-    nombre_usuario: 'Juan Pérez (Hilado)',
-    id_equipo: 1,
-    nombre_equipo: 'Impresora de Etiquetas',
-    nombre_area: 'Área de Hilado',
-    descripcion: 'Falla en la etiquetadora térmica, no imprime o se pierde la conexión de red.',
-    estado: 'Pendiente',
-    fecha_reporte: new Date().toISOString(),
-  },
-  {
-    id_ticket: 2,
-    id_usuario: 2,
-    nombre_usuario: 'Juan Pérez (Hilado)',
-    id_equipo: 5,
-    nombre_equipo: 'Router Industrial',
-    nombre_area: 'Tejeduría',
-    descripcion: 'Caída de red y pérdida de señal Wi-Fi en el Access Point (AP) del piso.',
-    estado: 'En Proceso',
-    fecha_reporte: new Date(Date.now() - 3600000).toISOString(),
-  }
-];
+import { inMemoryTickets, addInMemoryTicket } from '../../../lib/ticketStore';
 
 export const GET: APIRoute = async ({ request }) => {
   try {
@@ -138,10 +113,10 @@ export const POST: APIRoute = async ({ request }) => {
         nombre_equipo: `Equipo TI #${id_equipo}`,
         nombre_area: 'Área de Hilado',
         descripcion: descripcion.trim(),
-        estado: estadoInicial,
+        estado: estadoInicial as 'Pendiente' | 'En Proceso' | 'Resuelto',
         fecha_reporte: new Date().toISOString(),
       };
-      inMemoryTickets.unshift(mockNewTicket);
+      addInMemoryTicket(mockNewTicket);
 
       return new Response(
         JSON.stringify({

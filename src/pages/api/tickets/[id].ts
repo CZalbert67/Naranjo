@@ -1,5 +1,6 @@
 import type { APIRoute } from 'astro';
 import { getDbPool } from '../../../lib/db';
+import { updateInMemoryTicketStatus } from '../../../lib/ticketStore';
 
 export const PUT: APIRoute = async ({ params, request }) => {
   try {
@@ -24,9 +25,12 @@ export const PUT: APIRoute = async ({ params, request }) => {
       );
     }
 
+    // Siempre actualizar la tienda en memoria para sincronización instantánea
+    updateInMemoryTicketStatus(ticketId, estado);
+
     try {
       const pool = await getDbPool();
-      const result = await pool
+      await pool
         .request()
         .input('id_ticket', ticketId)
         .input('estado', estado)
@@ -46,7 +50,7 @@ export const PUT: APIRoute = async ({ params, request }) => {
         { status: 200, headers: { 'Content-Type': 'application/json' } }
       );
     } catch (dbErr) {
-      console.warn('[Tickets PUT API] DB no disponible, actualizando respuesta simulada:', dbErr);
+      console.warn('[Tickets PUT API] DB no disponible, estado actualizado en memoria:', dbErr);
       return new Response(
         JSON.stringify({
           success: true,
