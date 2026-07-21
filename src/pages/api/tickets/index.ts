@@ -11,7 +11,7 @@ let inMemoryTickets = [
     id_equipo: 1,
     nombre_equipo: 'Impresora de Etiquetas',
     nombre_area: 'Área de Hilado',
-    descripcion: 'Falla en impresora de etiquetas, no imprime o se pierde la conexión.',
+    descripcion: 'Falla en la etiquetadora térmica, no imprime o se pierde la conexión de red.',
     estado: 'Pendiente',
     fecha_reporte: new Date().toISOString(),
   },
@@ -19,10 +19,10 @@ let inMemoryTickets = [
     id_ticket: 2,
     id_usuario: 2,
     nombre_usuario: 'Juan Pérez (Hilado)',
-    id_equipo: 4,
-    nombre_equipo: 'Telar Industrial TK-4029',
+    id_equipo: 5,
+    nombre_equipo: 'Router Industrial',
     nombre_area: 'Tejeduría',
-    descripcion: 'Error de calibración en lectura de hilo.',
+    descripcion: 'Caída de red y pérdida de señal Wi-Fi en el Access Point (AP) del piso.',
     estado: 'En Proceso',
     fecha_reporte: new Date(Date.now() - 3600000).toISOString(),
   }
@@ -74,7 +74,6 @@ export const POST: APIRoute = async ({ request }) => {
     const body = await request.json().catch(() => ({}));
     let { id_usuario, id_equipo, descripcion } = body || {};
 
-    // Obtener sesión del usuario si no viene id_usuario explícito
     if (!id_usuario) {
       const cookieHeader = request.headers.get('cookie');
       const session = getSessionFromCookie(cookieHeader);
@@ -83,8 +82,6 @@ export const POST: APIRoute = async ({ request }) => {
       }
     }
 
-    // PT-02: Validación de Integridad
-    // Si falta id_equipo o descripcion o id_usuario, retornar 400 Bad Request de inmediato
     if (!id_equipo || !descripcion || typeof descripcion !== 'string' || descripcion.trim() === '') {
       return new Response(
         JSON.stringify({
@@ -96,7 +93,6 @@ export const POST: APIRoute = async ({ request }) => {
     }
 
     if (!id_usuario) {
-      // Si aún no se pudo determinar el usuario, usar id_usuario = 2 por defecto en operario
       id_usuario = 2;
     }
 
@@ -139,7 +135,7 @@ export const POST: APIRoute = async ({ request }) => {
         id_usuario,
         nombre_usuario: 'Operario Planta',
         id_equipo: Number(id_equipo),
-        nombre_equipo: `Equipo #${id_equipo}`,
+        nombre_equipo: `Equipo TI #${id_equipo}`,
         nombre_area: 'Área de Hilado',
         descripcion: descripcion.trim(),
         estado: estadoInicial,

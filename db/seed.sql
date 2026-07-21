@@ -8,26 +8,28 @@ BEGIN
     ('Área de Hilado'),
     ('Tejeduría'),
     ('Almacén'),
-    ('Mantenimiento');
+    ('Oficinas / Administración');
 END;
 
--- Insertar Equipos
+-- Insertar Equipos EXCLUSIVAMENTE de Soporte de TI
 IF NOT EXISTS (SELECT * FROM Equipos)
 BEGIN
     INSERT INTO Equipos (id_area, tipo_equipo) VALUES 
     (1, 'Impresora de Etiquetas'),
-    (1, 'Terminal / Monitor Industrial'),
-    (1, 'Nodo de Red / Switch'),
-    (2, 'Telar Industrial TK-4029'),
-    (2, 'Sensor de Nivel Ultrasónico'),
-    (3, 'Impresora Departamental Mass'),
-    (4, 'Bomba de Agua / Hidráulica');
+    (1, 'PC / Terminal Industrial'),
+    (1, 'Access Point (AP Wi-Fi)'),
+    (2, 'Cámara de Seguridad IP'),
+    (2, 'Router Industrial'),
+    (2, 'PC / Monitor de Control'),
+    (3, 'Impresora Departamental'),
+    (3, 'Etiquetadora Térmica Barcode'),
+    (3, 'Access Point (AP Wi-Fi)'),
+    (4, 'PC de Escritorio'),
+    (4, 'Router / Switch de Red'),
+    (4, 'Impresora Multifuncional');
 END;
 
 -- Insertar Usuarios por defecto
--- Nota: Contraseñas por defecto:
--- admin / admin123 (hash bcrypt)
--- operario1 / operario123 (hash bcrypt)
 IF NOT EXISTS (SELECT * FROM Usuarios)
 BEGIN
     INSERT INTO Usuarios (nombre_completo, rol, usuario, password_hash) VALUES 
