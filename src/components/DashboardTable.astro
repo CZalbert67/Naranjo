@@ -21,11 +21,11 @@
       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
       </svg>
-      <span>Alta & Control de Usuarios</span>
+      <span>Alta, Edición & Control de Usuarios</span>
     </button>
   </div>
 
-  <!-- SECCIÓN 1: DÁSHBOARD DE TICKETS -->
+  <!-- SECCIÓN 1: DASHBOARD DE TICKETS -->
   <div id="sectionTickets" class="space-y-6">
     <!-- Tarjetas de Resumen KPI -->
     <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -89,11 +89,11 @@
     </div>
   </div>
 
-  <!-- SECCIÓN 2: ALTA Y CONTROL DE USUARIOS -->
+  <!-- SECCIÓN 2: ALTA, EDICIÓN Y CONTROL DE USUARIOS -->
   <div id="sectionUsers" class="hidden space-y-6">
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
       
-      <!-- Formulario de Registro de Usuario -->
+      <!-- Formulario de Registro / Edición de Usuario -->
       <div class="lg:col-span-1 bg-slate-900/80 border border-sky-900/50 rounded-3xl p-6 shadow-2xl h-fit">
         <div class="flex items-center space-x-3 mb-5 pb-3 border-b border-sky-900/50">
           <div class="w-10 h-10 bg-orange-500/10 border border-orange-500/30 rounded-xl flex items-center justify-center text-orange-400">
@@ -102,7 +102,7 @@
             </svg>
           </div>
           <div>
-            <h3 class="text-lg font-bold text-white">Dar de Alta Usuario</h3>
+            <h3 id="formUserTitle" class="text-lg font-bold text-white">Dar de Alta Usuario</h3>
             <p class="text-xs text-sky-300">Registrar nuevo Empleado o Admin TI</p>
           </div>
         </div>
@@ -110,6 +110,8 @@
         <div id="userAlert" class="hidden mb-4 p-3 bg-emerald-500/10 border border-emerald-500/30 rounded-xl text-emerald-400 text-xs font-semibold"></div>
 
         <form id="newUserForm" class="space-y-4">
+          <input type="hidden" id="editing_user_id" value="" />
+
           <div>
             <label for="nombre_completo" class="block text-xs font-bold text-sky-200 uppercase mb-1">Nombre Completo</label>
             <input 
@@ -134,13 +136,12 @@
             />
           </div>
 
-          <div>
+          <div id="passContainer">
             <label for="new_password" class="block text-xs font-bold text-sky-200 uppercase mb-1">Contraseña</label>
             <input 
               type="password" 
               id="new_password" 
               name="password" 
-              required 
               placeholder="••••••••"
               class="w-full px-3.5 py-2.5 bg-slate-950/80 border border-sky-900/60 rounded-xl text-white text-sm focus:outline-none focus:border-orange-500"
             />
@@ -159,13 +160,22 @@
             </select>
           </div>
 
-          <button 
-            type="submit" 
-            id="btnCreateUser"
-            class="w-full touch-target bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-400 hover:to-orange-500 text-white font-extrabold rounded-xl transition-all shadow-md shadow-orange-500/20 text-sm uppercase tracking-wide mt-2"
-          >
-            Registrar Usuario
-          </button>
+          <div class="flex space-x-2 pt-1">
+            <button 
+              type="submit" 
+              id="btnCreateUser"
+              class="flex-1 touch-target bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-400 hover:to-orange-500 text-white font-extrabold rounded-xl transition-all shadow-md shadow-orange-500/20 text-sm uppercase tracking-wide"
+            >
+              Registrar Usuario
+            </button>
+            <button 
+              type="button" 
+              id="btnCancelEdit"
+              class="hidden px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 rounded-xl text-xs font-bold transition-all"
+            >
+              Cancelar
+            </button>
+          </div>
         </form>
       </div>
 
@@ -173,8 +183,8 @@
       <div class="lg:col-span-2 bg-slate-900/80 border border-sky-900/50 rounded-3xl p-6 shadow-2xl">
         <div class="flex items-center justify-between mb-5 pb-3 border-b border-sky-900/50">
           <div>
-            <h3 class="text-lg font-bold text-white">Directorio de Usuarios</h3>
-            <p class="text-xs text-sky-300">Personal de Planta y TI autorizados</p>
+            <h3 class="text-lg font-bold text-white">Directorio de Usuarios & Acciones</h3>
+            <p class="text-xs text-sky-300">Editar, suspender, eliminar o ver historial de reportes</p>
           </div>
         </div>
 
@@ -182,21 +192,40 @@
           <table class="w-full text-left text-sm text-slate-300">
             <thead class="bg-slate-950/80 text-xs font-bold text-sky-400 uppercase border-b border-sky-900/60">
               <tr>
-                <th class="px-4 py-3">ID</th>
-                <th class="px-4 py-3">Nombre Completo</th>
-                <th class="px-4 py-3">Usuario</th>
-                <th class="px-4 py-3">Rol</th>
+                <th class="px-3 py-3">ID</th>
+                <th class="px-3 py-3">Nombre</th>
+                <th class="px-3 py-3">Usuario</th>
+                <th class="px-3 py-3">Rol</th>
+                <th class="px-3 py-3">Estado</th>
+                <th class="px-3 py-3 text-right">Acciones</th>
               </tr>
             </thead>
             <tbody id="usersTableBody" class="divide-y divide-sky-900/30">
               <tr>
-                <td colspan="4" class="px-4 py-8 text-center text-slate-500">Cargando directorio de usuarios...</td>
+                <td colspan="6" class="px-4 py-8 text-center text-slate-500">Cargando directorio de usuarios...</td>
               </tr>
             </tbody>
           </table>
         </div>
       </div>
 
+    </div>
+  </div>
+</div>
+
+<!-- Modal para Ver Historial de Reportes del Usuario -->
+<div id="userHistoryModal" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+  <div class="bg-slate-900 border border-sky-900/60 rounded-3xl max-w-2xl w-full p-6 shadow-2xl space-y-4">
+    <div class="flex items-center justify-between border-b border-sky-900/50 pb-3">
+      <div>
+        <h3 id="modalUserName" class="text-lg font-bold text-white">Historial del Usuario</h3>
+        <p class="text-xs text-sky-400">Reportes de fallas técnicas levantados anteriormente</p>
+      </div>
+      <button id="closeUserHistoryModal" class="text-slate-400 hover:text-white text-2xl font-bold px-2">&times;</button>
+    </div>
+
+    <div class="max-h-96 overflow-y-auto space-y-3" id="modalHistoryContent">
+      <p class="text-xs text-slate-500 text-center py-4">Cargando historial de reportes...</p>
     </div>
   </div>
 </div>
@@ -219,7 +248,11 @@
     nombre_completo: string;
     usuario: string;
     rol: 'Operario' | 'Administrador';
+    estado_usuario?: 'Activo' | 'Suspendido';
   }
+
+  let allTicketsCache: Ticket[] = [];
+  let allUsersCache: User[] = [];
 
   // Pestañas
   const tabTickets = document.getElementById('tabTickets') as HTMLButtonElement;
@@ -239,8 +272,23 @@
 
   // Formulario Usuario
   const newUserForm = document.getElementById('newUserForm') as HTMLFormElement;
+  const editingUserIdInput = document.getElementById('editing_user_id') as HTMLInputElement;
+  const formUserTitle = document.getElementById('formUserTitle') as HTMLHeadingElement;
   const userAlert = document.getElementById('userAlert') as HTMLDivElement;
   const btnCreateUser = document.getElementById('btnCreateUser') as HTMLButtonElement;
+  const btnCancelEdit = document.getElementById('btnCancelEdit') as HTMLButtonElement;
+
+  // Modal Historial
+  const userHistoryModal = document.getElementById('userHistoryModal') as HTMLDivElement;
+  const closeUserHistoryModal = document.getElementById('closeUserHistoryModal') as HTMLButtonElement;
+  const modalUserName = document.getElementById('modalUserName') as HTMLHeadingElement;
+  const modalHistoryContent = document.getElementById('modalHistoryContent') as HTMLDivElement;
+
+  if (closeUserHistoryModal) {
+    closeUserHistoryModal.addEventListener('click', () => {
+      userHistoryModal.classList.add('hidden');
+    });
+  }
 
   // Manejo de Pestañas
   if (tabTickets && tabUsers) {
@@ -265,6 +313,7 @@
       tableBody.innerHTML = `<tr><td colspan="7" class="px-4 py-8 text-center text-slate-500">Cargando datos...</td></tr>`;
       const res = await fetch('/api/tickets');
       const tickets: Ticket[] = await res.json();
+      allTicketsCache = tickets;
       renderTickets(tickets);
     } catch (err) {
       tableBody.innerHTML = `<tr><td colspan="7" class="px-4 py-8 text-center text-red-400">Error al cargar los tickets.</td></tr>`;
@@ -370,18 +419,19 @@
 
   async function fetchUsers() {
     try {
-      usersTableBody.innerHTML = `<tr><td colspan="4" class="px-4 py-8 text-center text-slate-500">Cargando directorio...</td></tr>`;
+      usersTableBody.innerHTML = `<tr><td colspan="6" class="px-4 py-8 text-center text-slate-500">Cargando directorio...</td></tr>`;
       const res = await fetch('/api/users');
       const users: User[] = await res.json();
+      allUsersCache = users;
       renderUsers(users);
     } catch (err) {
-      usersTableBody.innerHTML = `<tr><td colspan="4" class="px-4 py-8 text-center text-red-400">Error al cargar usuarios.</td></tr>`;
+      usersTableBody.innerHTML = `<tr><td colspan="6" class="px-4 py-8 text-center text-red-400">Error al cargar usuarios.</td></tr>`;
     }
   }
 
   function renderUsers(users: User[]) {
     if (!users || users.length === 0) {
-      usersTableBody.innerHTML = `<tr><td colspan="4" class="px-4 py-8 text-center text-slate-500">No hay usuarios registrados.</td></tr>`;
+      usersTableBody.innerHTML = `<tr><td colspan="6" class="px-4 py-8 text-center text-slate-500">No hay usuarios registrados.</td></tr>`;
       return;
     }
 
@@ -390,57 +440,211 @@
       const tr = document.createElement('tr');
       tr.className = 'hover:bg-slate-800/40 transition-colors';
       const isTI = u.rol === 'Administrador';
+      const isSuspended = u.estado_usuario === 'Suspendido';
 
       tr.innerHTML = `
-        <td class="px-4 py-3 text-xs font-mono text-slate-400">#USR-${u.id_usuario}</td>
-        <td class="px-4 py-3 font-semibold text-white">${u.nombre_completo}</td>
-        <td class="px-4 py-3 text-xs font-mono text-sky-300">${u.usuario}</td>
-        <td class="px-4 py-3">
-          <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold ${
+        <td class="px-3 py-3 text-xs font-mono text-slate-400">#USR-${u.id_usuario}</td>
+        <td class="px-3 py-3 font-semibold text-white">${u.nombre_completo}</td>
+        <td class="px-3 py-3 text-xs font-mono text-sky-300">${u.usuario}</td>
+        <td class="px-3 py-3">
+          <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold ${
             isTI 
               ? 'bg-orange-500/10 text-orange-400 border border-orange-500/30' 
               : 'bg-sky-500/10 text-sky-400 border border-sky-500/30'
           }">
-            ${u.rol === 'Administrador' ? 'Departamento de TI' : 'Operario de Planta'}
+            ${u.rol === 'Administrador' ? 'TI Admin' : 'Operario'}
           </span>
+        </td>
+        <td class="px-3 py-3">
+          <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold ${
+            isSuspended 
+              ? 'bg-red-500/10 text-red-400 border border-red-500/30' 
+              : 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30'
+          }">
+            ${isSuspended ? 'Suspendido' : 'Activo'}
+          </span>
+        </td>
+        <td class="px-3 py-3 text-right space-x-1">
+          <button data-id="${u.id_usuario}" class="btn-history-user text-xs bg-sky-500/10 hover:bg-sky-500/20 text-sky-300 border border-sky-500/30 px-2 py-1 rounded-lg transition-all" title="Ver Historial de Reportes">
+            📜 Historial
+          </button>
+          <button data-id="${u.id_usuario}" class="btn-edit-user text-xs bg-slate-800 hover:bg-slate-700 text-amber-300 border border-slate-700 px-2 py-1 rounded-lg transition-all" title="Editar Usuario">
+            ✏️ Editar
+          </button>
+          <button data-id="${u.id_usuario}" data-status="${isSuspended ? 'Activo' : 'Suspendido'}" class="btn-toggle-suspend text-xs ${isSuspended ? 'bg-emerald-500/10 text-emerald-300 border-emerald-500/30' : 'bg-red-500/10 text-red-300 border-red-500/30'} border px-2 py-1 rounded-lg transition-all" title="${isSuspended ? 'Activar Cuenta' : 'Suspender Cuenta'}">
+            ${isSuspended ? '▶️ Activar' : '⏸️ Suspender'}
+          </button>
+          <button data-id="${u.id_usuario}" class="btn-delete-user text-xs bg-red-900/30 hover:bg-red-900/60 text-red-400 border border-red-800/40 px-2 py-1 rounded-lg transition-all" title="Eliminar Usuario">
+            🗑️
+          </button>
         </td>
       `;
       usersTableBody.appendChild(tr);
     });
+
+    // Configurar listeners de acciones de usuario
+    document.querySelectorAll('.btn-history-user').forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        const id = (e.currentTarget as HTMLButtonElement).getAttribute('data-id');
+        if (id) showUserHistoryModal(parseInt(id, 10));
+      });
+    });
+
+    document.querySelectorAll('.btn-edit-user').forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        const id = (e.currentTarget as HTMLButtonElement).getAttribute('data-id');
+        if (id) startEditingUser(parseInt(id, 10));
+      });
+    });
+
+    document.querySelectorAll('.btn-toggle-suspend').forEach((btn) => {
+      btn.addEventListener('click', async (e) => {
+        const target = e.currentTarget as HTMLButtonElement;
+        const id = target.getAttribute('data-id');
+        const newStatus = target.getAttribute('data-status');
+        if (id && newStatus) {
+          await toggleUserStatus(parseInt(id, 10), newStatus);
+        }
+      });
+    });
+
+    document.querySelectorAll('.btn-delete-user').forEach((btn) => {
+      btn.addEventListener('click', async (e) => {
+        const id = (e.currentTarget as HTMLButtonElement).getAttribute('data-id');
+        if (id && confirm(`¿Estás seguro de eliminar este usuario y sus tickets registrados?`)) {
+          await deleteUser(parseInt(id, 10));
+        }
+      });
+    });
+  }
+
+  function startEditingUser(userId: number) {
+    const user = allUsersCache.find((u) => u.id_usuario === userId);
+    if (!user) return;
+
+    editingUserIdInput.value = user.id_usuario.toString();
+    (document.getElementById('nombre_completo') as HTMLInputElement).value = user.nombre_completo;
+    (document.getElementById('new_usuario') as HTMLInputElement).value = user.usuario;
+    (document.getElementById('rol') as HTMLSelectElement).value = user.rol;
+
+    formUserTitle.innerText = `Editar Usuario #${user.id_usuario}`;
+    btnCreateUser.innerText = 'Guardar Cambios';
+    btnCancelEdit.classList.remove('hidden');
+  }
+
+  if (btnCancelEdit) {
+    btnCancelEdit.addEventListener('click', resetUserForm);
+  }
+
+  function resetUserForm() {
+    editingUserIdInput.value = '';
+    newUserForm.reset();
+    formUserTitle.innerText = 'Dar de Alta Usuario';
+    btnCreateUser.innerText = 'Registrar Usuario';
+    btnCancelEdit.classList.add('hidden');
+  }
+
+  async function toggleUserStatus(userId: number, estado_usuario: string) {
+    try {
+      const res = await fetch(`/api/users/${userId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ estado_usuario }),
+      });
+      if (res.ok) fetchUsers();
+    } catch (err) {
+      console.error('Error al cambiar estado de usuario:', err);
+    }
+  }
+
+  async function deleteUser(userId: number) {
+    try {
+      const res = await fetch(`/api/users/${userId}`, { method: 'DELETE' });
+      if (res.ok) fetchUsers();
+    } catch (err) {
+      console.error('Error al eliminar usuario:', err);
+    }
+  }
+
+  function showUserHistoryModal(userId: number) {
+    const user = allUsersCache.find((u) => u.id_usuario === userId);
+    modalUserName.innerText = `Historial de Reportes: ${user ? user.nombre_completo : `Usuario #${userId}`}`;
+
+    const userTickets = allTicketsCache.filter((t) => t.id_usuario === userId);
+
+    if (userTickets.length === 0) {
+      modalHistoryContent.innerHTML = `<p class="text-xs text-slate-500 text-center py-6">Este usuario no ha levantado peticiones o reportes en el sistema.</p>`;
+    } else {
+      modalHistoryContent.innerHTML = '';
+      userTickets.forEach((t) => {
+        const item = document.createElement('div');
+        item.className = 'bg-slate-950 border border-sky-900/40 p-3.5 rounded-2xl space-y-1';
+        
+        let badgeColor = 'text-red-400 border-red-500/30 bg-red-500/10';
+        if (t.estado === 'En Proceso') badgeColor = 'text-orange-400 border-orange-500/30 bg-orange-500/10';
+        if (t.estado === 'Resuelto') badgeColor = 'text-emerald-400 border-emerald-500/30 bg-emerald-500/10';
+
+        item.innerHTML = `
+          <div class="flex items-center justify-between text-xs">
+            <span class="font-mono font-bold text-orange-400">#TK-${t.id_ticket} - ${t.nombre_equipo || 'Equipo TI'}</span>
+            <span class="px-2 py-0.5 rounded-full text-xs font-bold border ${badgeColor}">${t.estado}</span>
+          </div>
+          <p class="text-sm text-white">${t.descripcion}</p>
+          <p class="text-xs text-slate-400">${new Date(t.fecha_reporte).toLocaleString('es-MX')}</p>
+        `;
+        modalHistoryContent.appendChild(item);
+      });
+    }
+
+    userHistoryModal.classList.remove('hidden');
   }
 
   if (newUserForm) {
     newUserForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       userAlert.classList.add('hidden');
-      btnCreateUser.disabled = true;
-      btnCreateUser.innerText = 'Registrando...';
 
+      const editingId = editingUserIdInput.value;
       const formData = new FormData(newUserForm);
-      const payload = {
+
+      const payload: any = {
         nombre_completo: formData.get('nombre_completo'),
         usuario: formData.get('usuario'),
-        password: formData.get('password'),
         rol: formData.get('rol'),
       };
 
+      const pass = formData.get('password');
+      if (pass) payload.password = pass;
+
+      btnCreateUser.disabled = true;
+      btnCreateUser.innerText = 'Guardando...';
+
       try {
-        const res = await fetch('/api/users', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload),
-        });
+        let res;
+        if (editingId) {
+          res = await fetch(`/api/users/${editingId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+          });
+        } else {
+          res = await fetch('/api/users', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+          });
+        }
 
         const data = await res.json();
 
         if (res.ok && data.success) {
-          userAlert.innerText = data.message || 'Usuario registrado exitosamente.';
+          userAlert.innerText = data.message || 'Operación realizada con éxito.';
           userAlert.className = 'mb-4 p-3 bg-emerald-500/10 border border-emerald-500/30 rounded-xl text-emerald-400 text-xs font-semibold';
           userAlert.classList.remove('hidden');
-          newUserForm.reset();
+          resetUserForm();
           fetchUsers();
         } else {
-          userAlert.innerText = data.error || 'Error al registrar el usuario.';
+          userAlert.innerText = data.error || 'Error en la operación.';
           userAlert.className = 'mb-4 p-3 bg-red-500/10 border border-red-500/30 rounded-xl text-red-400 text-xs font-semibold';
           userAlert.classList.remove('hidden');
         }
@@ -450,7 +654,7 @@
         userAlert.classList.remove('hidden');
       } finally {
         btnCreateUser.disabled = false;
-        btnCreateUser.innerText = 'Registrar Usuario';
+        btnCreateUser.innerText = editingId ? 'Guardar Cambios' : 'Registrar Usuario';
       }
     });
   }

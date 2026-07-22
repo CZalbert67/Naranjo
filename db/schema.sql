@@ -28,7 +28,7 @@ BEGIN
     );
 END;
 
--- 3. Tabla de Usuarios
+-- 3. Tabla de Usuarios (con estado_usuario para suspender/activar)
 IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'Usuarios')
 BEGIN
     CREATE TABLE Usuarios (
@@ -36,7 +36,8 @@ BEGIN
         nombre_completo VARCHAR(100) NOT NULL,
         rol VARCHAR(20) NOT NULL CHECK (rol IN ('Operario', 'Administrador')),
         usuario VARCHAR(50) UNIQUE NOT NULL,
-        password_hash VARCHAR(255) NOT NULL
+        password_hash VARCHAR(255) NOT NULL,
+        estado_usuario VARCHAR(20) DEFAULT 'Activo' CHECK (estado_usuario IN ('Activo', 'Suspendido'))
     );
 END;
 
