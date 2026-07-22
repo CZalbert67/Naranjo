@@ -7,4 +7,14 @@ import DashboardTable from '../components/DashboardTable.astro';
   <div class="py-4">
     <DashboardTable />
   </div>
+
+  <script>
+    // Verificación de seguridad en el cliente: Exigir sesión activa y rol de Administrador
+    const isActive = sessionStorage.getItem('fn_session_active');
+    const userRole = sessionStorage.getItem('fn_user_role');
+
+    if (!isActive || userRole !== 'Administrador') {
+      window.location.href = '/?error=unauthorized';
+    }
+  </script>
 </Layout>

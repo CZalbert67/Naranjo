@@ -94,7 +94,9 @@ export const POST: APIRoute = async ({ request }) => {
     };
 
     const token = createSessionToken(sessionData);
-    const cookieHeader = `session_token=${token}; HttpOnly; Path=/; SameSite=Strict; Max-Age=86400`;
+
+    // Cookie de sesión estricta (sin Max-Age de 24h para que sea una cookie de sesión temporal estricta)
+    const cookieHeader = `session_token=${token}; HttpOnly; Path=/; SameSite=Strict`;
 
     return new Response(
       JSON.stringify({ success: true, user: sessionData }),

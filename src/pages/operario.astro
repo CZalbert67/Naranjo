@@ -7,4 +7,11 @@ import TicketForm from '../components/TicketForm.astro';
   <div class="py-6 flex flex-col items-center justify-center">
     <TicketForm />
   </div>
+
+  <script>
+    // Verificación de seguridad en el cliente: Si la URL fue copiada y abierta sin haber iniciado sesión en esta ventana
+    if (!sessionStorage.getItem('fn_session_active')) {
+      window.location.href = '/?error=unauthorized';
+    }
+  </script>
 </Layout>

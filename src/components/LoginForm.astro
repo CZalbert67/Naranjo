@@ -61,11 +61,11 @@
   const submitBtn = document.getElementById('submitBtn') as HTMLButtonElement;
   const btnText = document.getElementById('btnText') as HTMLSpanElement;
 
-  // Detectar si fue redirigido por intentar copiar/acceder a una URL protegida sin login
   const urlParams = new URLSearchParams(window.location.search);
   if (urlParams.get('error') === 'unauthorized') {
     alertDiv.innerText = 'Debes iniciar sesión para acceder al sistema.';
     alertDiv.classList.remove('hidden');
+    sessionStorage.clear();
   }
 
   if (form) {
@@ -89,16 +89,22 @@
         const data = await res.json();
 
         if (res.ok && data.success) {
+          // Registrar estado de sesión activa en la pestaña/ventana actual
+          sessionStorage.setItem('fn_session_active', 'true');
+          sessionStorage.setItem('fn_user_role', data.user?.rol || '');
+
           if (data.user?.rol === 'Administrador') {
             window.location.href = '/dashboard';
           } else {
             window.location.href = '/operario';
           }
         } else {
+          sessionStorage.clear();
           alertDiv.innerText = data.error || 'Credenciales inválidas.';
           alertDiv.classList.remove('hidden');
         }
       } catch (err) {
+        sessionStorage.clear();
         alertDiv.innerText = 'Error de comunicación con el servidor.';
         alertDiv.classList.remove('hidden');
       } finally {
