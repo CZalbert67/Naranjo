@@ -110,18 +110,18 @@
     </form>
   </div>
 
-  <!-- SECCIÓN 2: HISTORIAL DE MIS REPORTES (OPERARIO) -->
+  <!-- SECCIÓN 2: HISTORIAL DE MIS REPORTES (EXCLUSIVO DEL OPERARIO LOGUEADO) -->
   <div id="sectionMyTickets" class="hidden bg-slate-900/90 border border-sky-900/50 rounded-3xl shadow-2xl p-6 sm:p-8 backdrop-blur-xl space-y-4">
     <div class="flex items-center justify-between pb-3 border-b border-sky-900/50">
       <div>
         <h3 class="text-lg font-bold text-white">Historial de Mis Reportes</h3>
-        <p class="text-xs text-sky-300">Monitorea el estado de tus peticiones enviadas a TI</p>
+        <p class="text-xs text-sky-300">Monitorea el estado de tus peticiones personales enviadas a TI</p>
       </div>
       <button id="btnRefreshMyTickets" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-xl border border-sky-900/40">Actualizar</button>
     </div>
 
     <div id="myTicketsList" class="space-y-3 max-h-96 overflow-y-auto">
-      <p class="text-xs text-slate-500 text-center py-6">Cargando mis reportes enviadas...</p>
+      <p class="text-xs text-slate-500 text-center py-6">Cargando mis reportes en curso...</p>
     </div>
   </div>
 </div>
@@ -177,17 +177,18 @@
   async function fetchMyTickets() {
     try {
       myTicketsList.innerHTML = `<p class="text-xs text-slate-500 text-center py-6">Cargando mis reportes...</p>`;
-      const res = await fetch('/api/tickets');
+      // Invocación del endpoint con el parámetro mine=true para obtener únicamente los del operario actual
+      const res = await fetch('/api/tickets?mine=true');
       const tickets: Ticket[] = await res.json();
       renderMyTickets(tickets);
     } catch (err) {
-      myTicketsList.innerHTML = `<p class="text-xs text-red-400 text-center py-6">Error al obtener historial.</p>`;
+      myTicketsList.innerHTML = `<p class="text-xs text-red-400 text-center py-6">Error al obtener historial personal.</p>`;
     }
   }
 
   function renderMyTickets(tickets: Ticket[]) {
     if (!tickets || tickets.length === 0) {
-      myTicketsList.innerHTML = `<p class="text-xs text-slate-500 text-center py-6">No has enviado ningún reporte aún.</p>`;
+      myTicketsList.innerHTML = `<p class="text-xs text-slate-500 text-center py-6">No has enviado ningún reporte personal aún.</p>`;
       return;
     }
 

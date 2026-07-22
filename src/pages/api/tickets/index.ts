@@ -3,11 +3,32 @@ import { getDbPool } from '../../../lib/db';
 import { getSessionFromCookie } from '../../../lib/auth';
 import { inMemoryTickets, addInMemoryTicket } from '../../../lib/ticketStore';
 
-export const GET: APIRoute = async ({ request }) => {
+export const GET: APIRoute = async ({ request, url }) => {
   try {
+    const isMine = url.searchParams.get('mine') === 'true';
+    const paramUserId = url.searchParams.get('id_usuario');
+    const cookieHeader = request.headers.get('cookie');
+    const session = getSessionFromCookie(cookieHeader);
+
+    let filterUserId: number | null = null;
+
+    if (isMine) {
+      if (session) {
+        filterUserId = session.id_usuario;
+      } else {
+        // Fallback para dev/test si no hay cookie de sesión activa: id_usuario operario por defecto (2)
+        filterUserId = 2;
+      }
+    } else if (paramUserId) {
+      const parsed = parseInt(paramUserId, 10);
+      if (!isNaN(parsed) && parsed > 0) {
+        filterUserId = parsed;
+      }
+    }
+
     try {
       const pool = await getDbPool();
-      const result = await pool.request().query(`
+      let query = `
         SELECT 
           t.id_ticket,
           t.id_usuario,
@@ -22,8 +43,20 @@ export const GET: APIRoute = async ({ request }) => {
         INNER JOIN Usuarios u ON t.id_usuario = u.id_usuario
         INNER JOIN Equipos e ON t.id_equipo = e.id_equipo
         INNER JOIN Areas a ON e.id_area = a.id_area
-        ORDER BY t.fecha_reporte DESC
-      `);
+      `;
+
+      if (filterUserId) {
+        query += ` WHERE t.id_usuario = @id_usuario `;
+      }
+
+      query += ` ORDER BY t.fecha_reporte DESC `;
+
+      const req = pool.request();
+      if (filterUserId) {
+        req.input('id_usuario', filterUserId);
+      }
+
+      const result = await req.query(query);
 
       return new Response(JSON.stringify(result.recordset), {
         status: 200,
@@ -31,7 +64,11 @@ export const GET: APIRoute = async ({ request }) => {
       });
     } catch (dbErr) {
       console.warn('[Tickets GET API] DB no disponible, usando inMemoryTickets fallback:', dbErr);
-      return new Response(JSON.stringify(inMemoryTickets), {
+      let list = inMemoryTickets;
+      if (filterUserId) {
+        list = list.filter((t) => t.id_usuario === filterUserId);
+      }
+      return new Response(JSON.stringify(list), {
         status: 200,
         headers: { 'Content-Type': 'application/json' },
       });
