@@ -61,6 +61,13 @@
   const submitBtn = document.getElementById('submitBtn') as HTMLButtonElement;
   const btnText = document.getElementById('btnText') as HTMLSpanElement;
 
+  // Detectar si fue redirigido por intentar copiar/acceder a una URL protegida sin login
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get('error') === 'unauthorized') {
+    alertDiv.innerText = 'Debes iniciar sesión para acceder al sistema.';
+    alertDiv.classList.remove('hidden');
+  }
+
   if (form) {
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -82,7 +89,6 @@
         const data = await res.json();
 
         if (res.ok && data.success) {
-          // Detección automática del rol y redirección a la vista correspondiente
           if (data.user?.rol === 'Administrador') {
             window.location.href = '/dashboard';
           } else {
